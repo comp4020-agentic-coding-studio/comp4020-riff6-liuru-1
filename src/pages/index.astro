@@ -3,7 +3,6 @@ import Card from "astro-theme-university/components/Card.astro";
 import CardGrid from "astro-theme-university/components/CardGrid.astro";
 import ContentLayout from "astro-theme-university/layouts/ContentLayout.astro";
 import { withBase } from "astro-theme-university/url";
-import heroImage from "../assets/images/hero-home.avif";
 import { courseMeta } from "../course-config";
 import { sessionLabels, siteConfig } from "../site-config";
 ---
@@ -11,8 +10,7 @@ import { sessionLabels, siteConfig } from "../site-config";
 <ContentLayout
   title={`${courseMeta.code}: ${courseMeta.title}`}
   description={courseMeta.description}
-  heroImage={heroImage}
-  heroImageAlt="Two crossing brush strokes, gold and black, overlaid with three nested carved-seal marks, flat shapes on warm cream in a two-ink risograph print"
+  mainAttrs={{ class: "homepage-main" }}
   {...siteConfig}
 >
   <ul class="course-tags" aria-label="Course tags">

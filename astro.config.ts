@@ -5,9 +5,15 @@ import { astromotion, deckRemarkPlugins } from "astromotion";
 import { courseMeta } from "./src/course-config.ts";
 import { courseApiCollections } from "./src/site-config.ts";
 import { gitOrigin, resolveDeployment } from "./scripts/pages-base.ts";
+import { fileURLToPath } from "node:url";
 
 // Derived, never hardcoded --- see scripts/pages-base.ts for why.
 const { site, base } = resolveDeployment(process.env, gitOrigin);
+
+// An absolute path so the theme's `import ${JSON.stringify(spec)}` (injected
+// into every page regardless of layout) resolves the same way whether or not
+// the process's cwd matches the project root.
+const themeOverrideCss = fileURLToPath(new URL("./src/styles/theme-override.css", import.meta.url));
 
 export default defineConfig({
   site,
@@ -22,7 +28,7 @@ export default defineConfig({
       defaultLayout: "src/layouts/PageLayout.astro",
       // The whole brand choice: three colour tokens and a set of lockups. Keep
       // institutional brand packages and assets out of this fictional site.
-      brandCss: "astro-theme-slop/slop.css",
+      brandCss: ["astro-theme-slop/slop.css", themeOverrideCss],
       imageFormat: "avif",
       llmsTxt: true,
       // The theme owns the markdown plugin chain, so astromotion's slide

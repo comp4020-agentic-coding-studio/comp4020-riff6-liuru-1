@@ -1,0 +1,181 @@
+/* Tang Yin retheme: paper, ink and cinnabar-seal palette.
+   Loaded via astro.config.ts's `brandCss`, the same mechanism the theme uses
+   for astro-theme-slop/slop.css --- an `astro:config:setup` hook injects a
+   page-ssr `import` of every brandCss entry into *every* route, independent
+   of which layout component a given page happens to render through. A
+   previous version of this lived in a <style is:global> inside
+   src/layouts/PageLayout.astro, which only reaches pages that render through
+   that layout (plain .mdx index pages) --- it silently missed the homepage,
+   every lecture/session detail page, and the Seminars index, all of which
+   import ContentLayout directly. Unlayered CSS beats the theme's
+   `@layer at.tokens` regardless of import order, so this still wins without
+   needing `!important`. */
+
+:root {
+  --at-primary: #a6321f;
+  --at-primary-hover: #8a291a;
+  --at-primary-active: #6f2015;
+  --at-accent: #a6321f;
+  --at-accent-soft: rgb(166 50 31 / 10%);
+  --at-bg: #faf3e2;
+  --at-bg-alt: #f1e6cd;
+  --at-bg-elevated: #fdf8ec;
+  --at-text: #1c1a17;
+  --at-text-secondary: rgb(28 26 23 / 78%);
+  --at-text-muted: rgb(28 26 23 / 60%);
+  --at-heading: #1c1a17;
+  --at-link: #a6321f;
+  --at-link-hover: #7a2819;
+  --at-border: rgb(28 26 23 / 20%);
+  --at-divider: rgb(28 26 23 / 16%);
+  --at-spacing-2xl: 5rem;
+  --seal-red: #a6321f;
+  --seal-red-soft: rgb(166 50 31 / 8%);
+}
+
+[data-theme="dark"] {
+  --at-bg: #201a14;
+  --at-bg-alt: #2a2119;
+  --at-bg-elevated: #251e17;
+  --at-text: #f1e6cd;
+  --at-text-secondary: rgb(241 230 205 / 78%);
+  --at-text-muted: rgb(241 230 205 / 60%);
+  --at-heading: #f1e6cd;
+  --at-link: #dd8f7c;
+  --at-link-hover: #ecb1a2;
+  --at-accent: #dd8f7c;
+  --at-accent-soft: rgb(221 143 124 / 12%);
+  --at-primary: #dd8f7c;
+  --at-primary-hover: #e7ab9c;
+  --at-border: rgb(241 230 205 / 20%);
+  --at-divider: rgb(241 230 205 / 14%);
+  --seal-red: #dd8f7c;
+  --seal-red-soft: rgb(221 143 124 / 10%);
+}
+
+/* Very faint paper tone --- two off-corner tints, no repeating noise, so it
+   reads as tonal variation rather than a texture pattern. */
+body {
+  background-image:
+    radial-gradient(ellipse 60% 40% at 6% -4%, rgb(166 50 31 / 4%), transparent 60%),
+    radial-gradient(ellipse 55% 40% at 100% 105%, rgb(28 26 23 / 5%), transparent 60%);
+  background-attachment: fixed;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: Georgia, "Noto Serif", "Songti SC", serif;
+}
+
+h2 {
+  margin-block-start: 2.5em;
+  padding-block-end: 0.35em;
+  border-block-end: 1px solid var(--at-divider);
+}
+
+/* Nav: active link gets a short brush-underline instead of the default
+   colour-only treatment. */
+.at-nav-links a {
+  position: relative;
+}
+
+.at-nav-links a[aria-current="page"] {
+  color: var(--seal-red);
+}
+
+.at-nav-links a[aria-current="page"]::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0.1rem;
+  bottom: -0.35rem;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--seal-red);
+}
+
+/* Cards: a thin cinnabar rule on the leading edge, warmer surface, serif
+   titles, a little more room to breathe. */
+.at-card {
+  border: 1px solid var(--at-divider);
+  border-inline-start: 3px solid var(--seal-red);
+  background: var(--at-bg-elevated);
+  border-radius: 0.35rem;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+a.at-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--at-shadow-md);
+  border-inline-start-color: var(--at-primary-hover);
+}
+
+.at-card-title {
+  font-family: Georgia, "Noto Serif", "Songti SC", serif;
+  font-size: 1.3rem;
+  margin-block-end: 0.5rem;
+}
+
+.at-card-body {
+  padding: var(--at-spacing-lg, 1.5rem);
+  display: grid;
+  gap: 0.4rem;
+}
+
+/* Seminars: same card system, softer blush tint so they read as a distinct
+   session type next to Lectures without a second layout. */
+.sessions-cards .at-card {
+  background: color-mix(in srgb, var(--seal-red) 5%, var(--at-bg-elevated));
+}
+
+/* Homepage hero: the theme's plain <h1>/<p class="lead"> fallback (no
+   heroImage), scoped via `mainAttrs` so only the homepage is affected. A
+   large, near-invisible 唐寅 glyph stands in for imagery the brief asked to
+   avoid adding. */
+.homepage-main {
+  overflow: hidden;
+}
+
+.homepage-main > h1 {
+  position: relative;
+  margin-block: 0.5rem 0.25rem;
+  padding-block: 1.25rem 0.5rem;
+  font-size: clamp(2.25rem, 5vw, 3.75rem);
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+}
+
+.homepage-main > h1::after {
+  content: "唐寅";
+  position: absolute;
+  top: -2.75rem;
+  right: -1rem;
+  font-family: "Songti SC", "Noto Serif SC", Georgia, serif;
+  font-size: 9rem;
+  line-height: 1;
+  color: var(--seal-red);
+  opacity: 0.07;
+  z-index: -1;
+  pointer-events: none;
+  user-select: none;
+}
+
+@media (max-width: 40rem) {
+  .homepage-main > h1::after {
+    display: none;
+  }
+}
+
+.homepage-main > p.lead {
+  font-size: 1.2rem;
+  color: var(--at-text-secondary);
+  max-inline-size: 42rem;
+  border-inline-start: 3px solid var(--seal-red);
+  padding-inline-start: 1rem;
+  margin-block-end: 2rem;
+}
