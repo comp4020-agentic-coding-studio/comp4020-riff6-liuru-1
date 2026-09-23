@@ -2,6 +2,7 @@
 import Card from "astro-theme-university/components/Card.astro";
 import CardGrid from "astro-theme-university/components/CardGrid.astro";
 import ContentLayout from "astro-theme-university/layouts/ContentLayout.astro";
+import { withBase } from "astro-theme-university/url";
 import heroImage from "../assets/images/hero-home.avif";
 import { courseMeta } from "../course-config";
 import { sessionLabels, siteConfig } from "../site-config";
@@ -47,6 +48,13 @@ import { sessionLabels, siteConfig } from "../site-config";
     reasoning usually goes, week 2 is built to push past it.
   </p>
 
+  <a class="interactive-callout" href={withBase("/model-audit/")}>
+    <span class="interactive-tag">Interactive</span>
+    <h2>Can a machine recognise a painter?</h2>
+    <p>Try the existing stroke classifier from week 9 --- draw a stroke, get a verdict, then find out what it actually learned.</p>
+    <span class="interactive-cta">Try the classifier &rarr;</span>
+  </a>
+
   <h2>Where to go next</h2>
   <CardGrid columns={2}>
     <Card title={sessionLabels.plural} href="/sessions/">
@@ -80,5 +88,51 @@ import { sessionLabels, siteConfig } from "../site-config";
     color: var(--at-text-secondary);
     background: var(--at-bg-alt);
     font-size: 0.9rem;
+  }
+
+  .interactive-callout {
+    display: block;
+    margin-block: 2rem;
+    padding: 1.5rem 1.75rem;
+    border: 1px solid var(--at-accent);
+    border-radius: 0.75rem;
+    background: var(--at-bg-alt);
+    text-decoration: none;
+    color: inherit;
+    transition:
+      transform 0.15s,
+      box-shadow 0.15s;
+  }
+
+  .interactive-callout:hover {
+    box-shadow: var(--at-shadow-md);
+    transform: translateY(-2px);
+  }
+
+  .interactive-callout h2 {
+    margin-block: 0.35rem 0.5rem;
+    padding-block-end: 0;
+    border-block-end: none;
+  }
+
+  .interactive-tag {
+    display: inline-block;
+    padding: 0.15rem 0.55rem;
+    border-radius: 0.2rem;
+    background: var(--at-accent);
+    color: var(--at-on-primary);
+    font-family: var(--at-font-mono);
+    font-size: var(--at-font-size-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .interactive-callout p {
+    margin-block-end: 0.75rem;
+  }
+
+  .interactive-cta {
+    font-weight: 600;
+    color: var(--at-accent);
   }
 </style>

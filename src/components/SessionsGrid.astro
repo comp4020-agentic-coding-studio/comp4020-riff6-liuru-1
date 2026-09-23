@@ -12,11 +12,26 @@ const visible = sessions.sort((a, b) => a.data.week - b.data.week);
   {
     visible.map((session) => (
       <Card headingLevel="h2" title={session.data.title} href={`/sessions/${session.id}/`}>
+        <span class="week-badge">Week {String(session.data.week).padStart(2, "0")}</span>
         {session.data.description && <p>{session.data.description}</p>}
         <p>
-          <small>Week {session.data.week} · {formatCourseDate(session.data.date)}</small>
+          <small>{formatCourseDate(session.data.date)}</small>
         </p>
       </Card>
     ))
   }
 </CardGrid>
+
+<style>
+  .week-badge {
+    display: inline-block;
+    margin-block-end: 0.6rem;
+    padding: 0.15rem 0.55rem;
+    border-radius: 0.2rem;
+    background: var(--at-accent);
+    color: var(--at-on-primary);
+    font-family: var(--at-font-mono);
+    font-size: var(--at-font-size-xs);
+    letter-spacing: 0.04em;
+  }
+</style>
