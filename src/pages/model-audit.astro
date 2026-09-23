@@ -6,41 +6,66 @@ import { siteConfig } from "../site-config";
 
 <ContentLayout
   title="Break the stroke classifier"
-  description="Week 9 describes running a stroke-level classifier live and trying
-    to break it. This is a toy version of that same exercise, playable right
-    here."
+  description="Draw a single stroke. The toy classifier will decide whether it
+    looks more like Tang Yin or a workshop copy. Then change your stroke and
+    see if you can expose what the model is really relying on."
   {...siteConfig}
 >
-  <p>
-    <a href={withBase("/sessions/09-model-audit/")}>Seminar 9</a> and
-    <a href={withBase("/lectures/week-09/")}>its lecture</a> both talk about Wren's
-    stroke-level classifier — trained to separate hands from low-level
-    features like curvature and pressure variation, and confidently wrong the
-    moment you feed it something its training set never saw. This page can't
-    ship that real model, so it ships a much smaller one built the same way:
-    a few dozen strokes, a handful of features, no idea what it actually
-    learned until you go looking.
-  </p>
+  <ol class="steps">
+    <li>
+      <span class="step-num">01</span>
+      <span class="step-title">Draw</span>
+      <p>Draw one continuous stroke.</p>
+    </li>
+    <li>
+      <span class="step-num">02</span>
+      <span class="step-title">Classify</span>
+      <p>Let the model inspect its simple stroke features.</p>
+    </li>
+    <li>
+      <span class="step-num">03</span>
+      <span class="step-title">Break it</span>
+      <p>Change the length, curvature, or shape and see whether the prediction changes.</p>
+    </li>
+  </ol>
 
   <div class="audit-board" id="audit-board">
-    <canvas
-      id="stroke-canvas"
-      width="520"
-      height="260"
-      aria-label="Drawing canvas: draw one stroke with your mouse or finger"
-    ></canvas>
-    <p class="hint">Draw one stroke. Then see what the classifier thinks.</p>
-    <div class="controls">
-      <button type="button" id="classify-btn" disabled>Classify this stroke</button>
+    <div class="audit-draw">
+      <canvas
+        id="stroke-canvas"
+        width="520"
+        height="260"
+        aria-label="Drawing canvas: draw one stroke with your mouse or finger"
+      ></canvas>
+      <p class="hint">Draw one continuous stroke.</p>
       <button type="button" id="clear-btn">Clear</button>
     </div>
 
-    <div class="verdict" id="verdict" role="status" hidden>
-      <p class="verdict-label"><span id="verdict-hand"></span></p>
-      <div class="confidence-bar">
-        <div class="confidence-fill" id="confidence-fill"></div>
+    <div class="audit-result">
+      <div class="result-panel">
+        <p class="result-label">Prediction</p>
+        <p class="placeholder" id="placeholder-msg">Draw a stroke, then classify it.</p>
+        <div class="verdict" id="verdict" role="status" hidden>
+          <p class="verdict-hand" id="verdict-hand"></p>
+          <p class="verdict-confidence"><span id="confidence-value"></span>% confidence</p>
+          <div class="confidence-bar">
+            <div class="confidence-fill" id="confidence-fill"></div>
+          </div>
+          <p class="confidence-caption" id="confidence-caption"></p>
+        </div>
+        <button type="button" id="classify-btn" disabled>Classify stroke</button>
       </div>
-      <p class="confidence-caption" id="confidence-caption"></p>
+
+      <div class="break-it">
+        <p class="break-it-label">Try to break it</p>
+        <p>Draw another stroke and change only one thing:</p>
+        <ul>
+          <li>make it longer</li>
+          <li>make it more curved</li>
+          <li>simplify the shape</li>
+        </ul>
+        <p>Can you make the prediction flip?</p>
+      </div>
     </div>
   </div>
 
@@ -63,15 +88,87 @@ import { siteConfig } from "../site-config";
       nothing about its output warns you which one you're getting.
     </p>
   </details>
+
+  <h2>Where this classifier came from</h2>
+  <p>
+    <a href={withBase("/sessions/09-model-audit/")}>Seminar 9</a> and
+    <a href={withBase("/lectures/week-09/")}>its lecture</a> both talk about Wren's
+    stroke-level classifier — trained to separate hands from low-level
+    features like curvature and pressure variation, and confidently wrong the
+    moment you feed it something its training set never saw. This page can't
+    ship that real model, so it ships a much smaller one built the same way:
+    a few dozen strokes, a handful of features, no idea what it actually
+    learned until you go looking.
+  </p>
 </ContentLayout>
 
 <style>
+  /* Three-step guide: compact, numbered, not a tutorial page. */
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-block: 1.5rem 2rem;
+    padding: 0;
+    list-style: none;
+  }
+
+  .steps li {
+    padding-inline-start: 0.85rem;
+    border-inline-start: 3px solid var(--seal-red, var(--at-accent));
+  }
+
+  .step-num {
+    display: block;
+    font-family: var(--at-font-mono);
+    font-size: 0.8rem;
+    letter-spacing: 0.06em;
+    color: var(--seal-red, var(--at-accent));
+  }
+
+  .step-title {
+    display: block;
+    font-family: Georgia, "Noto Serif", "Songti SC", serif;
+    font-size: 1.1rem;
+    margin-block: 0.15rem 0.2rem;
+  }
+
+  .steps p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--at-text-secondary);
+  }
+
+  @media (max-width: 40rem) {
+    .steps {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Classifier board: two columns on desktop (draw / result), one on mobile. */
   .audit-board {
-    margin-block: 2rem;
-    padding: 1.25rem;
-    border: 1px solid var(--at-border, #ccc);
-    border-radius: 0.75rem;
-    background: var(--at-bg-alt);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-block: 1.5rem 2rem;
+    padding: 1.5rem;
+    border: 1px solid var(--at-divider);
+    border-inline-start: 3px solid var(--seal-red, var(--at-accent));
+    border-radius: 0.5rem;
+    background: var(--at-bg-elevated);
+  }
+
+  @media (max-width: 48rem) {
+    .audit-board {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .audit-draw,
+  .audit-result {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
   }
 
   #stroke-canvas {
@@ -81,78 +178,129 @@ import { siteConfig } from "../site-config";
     height: auto;
     aspect-ratio: 520 / 260;
     touch-action: none;
-    border-radius: 0.5rem;
+    border-radius: 0.4rem;
     background: #fdfbf5;
-    border: 1px solid var(--at-border, #ccc);
+    border: 1px solid var(--at-divider);
     cursor: crosshair;
   }
 
   .hint {
-    margin-block: 0.5rem 0.75rem;
+    margin: 0;
     color: var(--at-text-secondary);
     font-size: 0.9rem;
   }
 
-  .controls {
-    display: flex;
-    gap: 0.75rem;
-    flex-wrap: wrap;
-  }
-
-  .controls button {
+  button {
+    align-self: flex-start;
     font: inherit;
-    padding: 0.5rem 1rem;
+    padding: 0.5rem 1.1rem;
     border-radius: 999px;
-    border: 1px solid var(--at-border, #ccc);
-    background: var(--at-bg, #fff);
+    border: 1px solid var(--at-divider);
+    background: var(--at-bg);
+    color: var(--at-text);
     cursor: pointer;
   }
 
-  .controls button:disabled {
+  button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
   }
 
-  .controls button#classify-btn:not(:disabled) {
-    background: var(--at-text-secondary);
-    color: var(--at-bg, #fff);
+  #classify-btn:not(:disabled) {
+    border-color: var(--seal-red, var(--at-accent));
+    background: var(--seal-red, var(--at-accent));
+    color: var(--at-on-primary, #fff);
+  }
+
+  .result-panel {
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--at-divider);
+    border-radius: 0.4rem;
+    background: var(--at-bg);
+  }
+
+  .result-label {
+    margin: 0 0 0.5rem;
+    font-family: var(--at-font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--at-text-muted);
+  }
+
+  .placeholder {
+    color: var(--at-text-muted);
+    font-size: 0.95rem;
   }
 
   .verdict {
-    margin-block-start: 1.25rem;
+    margin-block-end: 1rem;
   }
 
-  .verdict-label {
-    font-size: 1.2rem;
+  .verdict-hand {
+    font-family: Georgia, "Noto Serif", "Songti SC", serif;
+    font-size: 1.5rem;
+    margin: 0 0 0.15rem;
+  }
+
+  .verdict-confidence {
+    font-size: 1.1rem;
     font-weight: 600;
-    margin-block-end: 0.4rem;
+    color: var(--seal-red, var(--at-accent));
+    margin: 0 0 0.6rem;
   }
 
   .confidence-bar {
-    height: 0.6rem;
+    height: 0.5rem;
     border-radius: 999px;
-    background: var(--at-bg, #fff);
-    border: 1px solid var(--at-border, #ccc);
+    background: var(--at-bg-alt);
+    border: 1px solid var(--at-divider);
     overflow: hidden;
   }
 
   .confidence-fill {
     height: 100%;
     width: 0%;
-    background: var(--at-text-secondary);
+    background: var(--seal-red, var(--at-accent));
   }
 
   .confidence-caption {
-    margin-block-start: 0.4rem;
+    margin-block-start: 0.5rem;
     font-size: 0.9rem;
     color: var(--at-text-secondary);
+  }
+
+  .break-it {
+    padding: 1rem 1.25rem;
+    border: 1px dashed var(--at-divider);
+    border-radius: 0.4rem;
+  }
+
+  .break-it-label {
+    margin: 0 0 0.4rem;
+    font-family: var(--at-font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--seal-red, var(--at-accent));
+  }
+
+  .break-it p,
+  .break-it ul {
+    margin: 0.3rem 0;
+    font-size: 0.92rem;
+    color: var(--at-text-secondary);
+  }
+
+  .break-it ul {
+    padding-inline-start: 1.2rem;
   }
 
   .reveal {
     margin-block: 2rem;
     padding: 1rem 1.25rem;
-    border: 1px dashed var(--at-border, #ccc);
-    border-radius: 0.75rem;
+    border: 1px dashed var(--at-divider);
+    border-radius: 0.5rem;
   }
 
   .reveal summary {
@@ -172,10 +320,20 @@ import { siteConfig } from "../site-config";
   const ctx = canvas.getContext("2d")!;
   const classifyBtn = document.getElementById("classify-btn") as HTMLButtonElement;
   const clearBtn = document.getElementById("clear-btn") as HTMLButtonElement;
+  const placeholder = document.getElementById("placeholder-msg") as HTMLElement;
   const verdict = document.getElementById("verdict") as HTMLElement;
   const verdictHand = document.getElementById("verdict-hand") as HTMLElement;
+  const confidenceValue = document.getElementById("confidence-value") as HTMLElement;
   const confidenceFill = document.getElementById("confidence-fill") as HTMLElement;
   const confidenceCaption = document.getElementById("confidence-caption") as HTMLElement;
+
+  // Confidence is always reported for the winning side, so the same three
+  // bands apply regardless of which hand the model landed on.
+  function interpretConfidence(confidence: number): string {
+    if (confidence < 60) return "The model is almost uncertain — 50% would mean an even split.";
+    if (confidence <= 75) return "The model has a moderate preference.";
+    return "The model strongly prefers this classification.";
+  }
 
   let points: Point[] = [];
   let drawing = false;
@@ -208,6 +366,7 @@ import { siteConfig } from "../site-config";
     drawing = true;
     points = [toLocal(event)];
     verdict.hidden = true;
+    placeholder.hidden = false;
     classifyBtn.disabled = true;
     canvas.setPointerCapture(event.pointerId);
   });
@@ -231,6 +390,7 @@ import { siteConfig } from "../site-config";
     points = [];
     redraw();
     verdict.hidden = true;
+    placeholder.hidden = false;
     classifyBtn.disabled = true;
   });
 
@@ -276,14 +436,13 @@ import { siteConfig } from "../site-config";
       lengthScore * 0.75 + (1 - curvatureScore) * 0.15 + speedVarianceScore * 0.1;
     const confidence = Math.round(Math.min(Math.max(raw, 0.02), 0.98) * 100);
     const isTangYin = raw >= 0.5;
+    const winningConfidence = isTangYin ? confidence : 100 - confidence;
 
-    verdictHand.textContent = isTangYin
-      ? `Tang Yin's hand — ${confidence}% confident`
-      : `Workshop copy — ${100 - confidence}% confident`;
-    confidenceFill.style.width = `${isTangYin ? confidence : 100 - confidence}%`;
-    confidenceCaption.textContent = isTangYin
-      ? "High confidence. No hedge, no second opinion offered."
-      : "High confidence in the other direction. Same model, same certainty.";
+    verdictHand.textContent = isTangYin ? "Tang Yin's hand" : "Workshop copy";
+    confidenceValue.textContent = String(winningConfidence);
+    confidenceFill.style.width = `${winningConfidence}%`;
+    confidenceCaption.textContent = interpretConfidence(winningConfidence);
+    placeholder.hidden = true;
     verdict.hidden = false;
   }
 
