@@ -40,3 +40,6 @@ trustworthy.
 - running a small classifier against this course's own shortlisted
   paintings, live
 - where computational and human methods should and shouldn't be combined
+
+A much smaller model than Wren's, built the same way, is playable now:
+[break the stroke classifier](/model-audit/).

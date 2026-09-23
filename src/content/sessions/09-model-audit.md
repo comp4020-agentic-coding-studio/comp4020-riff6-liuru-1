@@ -36,3 +36,9 @@ about what it actually learned.
 Keep your "broke the model" example. If your final project touches on
 computational methods at all, it needs to state their limits as concretely
 as this seminar just demonstrated one, not as a general disclaimer.
+
+## Try it yourself
+
+A miniature, toy version of the same exercise is playable right now:
+[break the stroke classifier](/model-audit/). It's a much smaller model than
+Wren's, trained on far less, but it fails the same way.
